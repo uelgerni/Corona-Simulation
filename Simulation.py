@@ -6,16 +6,17 @@ import time
 
 # testing parameters for sim
 n = 500
-iPerc = 4  # percentage infected with no symptoms start
-sPerc = 2  # percentage sick at start, those two groups will sometimes have an overlap, ergo fewer infected than infectedPercentage*n/100
+iPerc = 5  # percentage infected with no symptoms start
+sPerc = 5  # percentage sick at start, those two groups will sometimes have an overlap, ergo fewer infected than infectedPercentage*n/100
 xLim, yLim = 1000, 1000  # area size
-contagionDist = 10  # distance where spread is possible
-contagionP = 15  # chance to spread when in reach
-
-infectedNum = 0
-healthyNum = n
-recoveredNum = 0
-criticalNum = 0
+contagionDist = 15  # distance where spread is possible
+contagionP = 25  # chance to spread when in reach
+infectedArray = np.array(0)
+criticalArray = np.array(0)
+healthyArray = np.array(n)
+deadArray = np.array(0)
+dayArray = np.array(0)
+recoveredArray = np.array(0)
 
 
 def initialize(popSize, infectedPercentage, sickPercentage, xLimit, yLimit):
@@ -45,27 +46,33 @@ def initialize(popSize, infectedPercentage, sickPercentage, xLimit, yLimit):
     return population
 
 
-population = initialize(n, iPerc, sPerc, xLim, yLim)
-
-
 def updatePop(pop: pd.DataFrame):
     for person in pop['Person']:
         if not person.infectious:
             pass
         else:
-            pop['Person'].apply(lambda z: z.setInfected() if (
-                    z.currentLocation.getDistanceLoc(
-                        z.currentLocation) < contagionDist & z.immune is False & random.random() < contagionP / 100) else z)
+            pop['Person'].apply(lambda z: z.setInfected() if checkForInfect(z) else z)
     pop['Person'].apply(Person.update)
     pop['xCoord'], pop['yCoord'] = \
         pop['Person'].apply(lambda z: z.currentLocation.x), pop['Person'].apply(lambda z: z.currentLocation.y)
+
     numInfected = pop['Person'].apply(lambda z: 1 if z.infectious else 0).sum()
     numCritical = pop['Person'].apply(lambda z: 1 if z.health is Health.CRITICAL else 0).sum()
-    numHealthy = pop.size - numInfected
+    numDead = pop['Person'].apply(lambda z: 1 if z.health is Health.DEAD else 0).sum()
+    numHealthy = len(pop.index) - numInfected - numDead
+    numRecovered = pop['Person'].apply(lambda z: 1 if z.health is Health.RECOVERED else 0).sum()
+    return numHealthy, numInfected, numCritical, numDead, numRecovered
 
-    return numInfected, numCritical, numHealthy
+
+def checkForInfect(z):
+    if z.currentLocation.getDistanceLoc(z.currentLocation) < contagionDist:
+        if not z.immune:
+            if random.random() < contagionP / 100:
+                return True
+    return False
 
 
+population = initialize(n, iPerc, sPerc, xLim, yLim)
 # plotting stuff
 
 # making a color list corresponding to health status
@@ -73,7 +80,7 @@ colors = [x.getColor() for x in population['Person']]
 
 # creating the plot
 
-fig, axs = plt.subplots(2)
+
 from matplotlib.lines import Line2D
 
 # making custom a custom legend
@@ -84,15 +91,34 @@ custom_lines = [Line2D([0], [0], color='w', markerfacecolor='green', lw=6, marke
                 Line2D([0], [0], color='w', markerfacecolor='blue', lw=4, marker='o'),
                 Line2D([0], [0], color='w', markerfacecolor='gray', lw=4, marker='o')]
 
-population.plot(x='xCoord', y='yCoord', kind='scatter', c=colors)
-plt.legend(custom_lines, ['Healthy', 'Infected', 'Sick', 'Hospitalized', 'Recovered', 'Dead'])
-plt.close()
-
 for i in range(1000):
-    updatePop(population)
+
+    stats = updatePop(population)
     colors = [x.getColor() for x in population['Person']]
-    population.plot(x='xCoord', y='yCoord', kind='scatter', c=colors)
-    plt.axis([0, 1000, 0, 1000])
+
+    #auskommentiert für niklas
+   # population.plot(x='xCoord', y='yCoord', kind='scatter', c=colors)
+   # plt.axis([0, 1000, 0, 1000])
+   # plt.figlegend(custom_lines, ['Healthy', 'Infected', 'Sick', 'Hospitalized', 'Recovered', 'Dead'])
+   # plt.savefig("simFigs/" + "{:03}".format(i))
+   # plt.close()
+
+    healthyArray = np.append(healthyArray, stats[0])
+    infectedArray = np.append(infectedArray, stats[1])
+    criticalArray = np.append(criticalArray, stats[2])
+    deadArray = np.append(deadArray, stats[3])
+    dayArray = np.append(dayArray, i + 1)
+    recoveredArray = np.append(recoveredArray, stats[4])
+
+    plt.plot(dayArray, healthyArray, color='green')
+    plt.plot(dayArray, deadArray, color='grey')
+    plt.plot(dayArray, infectedArray, color='yellow')
+    plt.plot(dayArray, criticalArray, color='red')
+    plt.plot(dayArray, recoveredArray, color='blue')
+
+    plt.axis([0, 100, 0, 550])
     plt.figlegend(custom_lines, ['Healthy', 'Infected', 'Sick', 'Hospitalized', 'Recovered', 'Dead'])
-    plt.savefig("simFigs/" + "{:03}".format(i))
+
+    plt.savefig("simStats/" + "{:03}".format(i))
+
     plt.close()
