@@ -113,8 +113,8 @@ class Person:
             self.daysUntilRecovered -= 1
         if self.daysUntilRecovered == 0:
             self.setRecovered()
-        if self.health is Health.HEALTHY:
-            if random.random() < 0.001:
+        if self.health is Health.INFECTED:
+            if random.random() < 0.1:
                 self.setSick()
         self.hospitalRoll()
         self.deathRoll()
@@ -139,11 +139,11 @@ class Person:
         if self.health is Health.INFECTED:
             if chance < .03:
                 self.setCritical()
-                self.daysUntilRecovered += 10
+                self.daysUntilRecovered += 100
         if self.health is Health.SICK:
             if chance < .06:
                 self.setCritical()
-                self.daysUntilRecovered += 10
+                self.daysUntilRecovered += 100
 
     def update(self):
         self.updateHealth()
@@ -167,13 +167,13 @@ class Person:
             raise Exception("something went wrong with getColor in Person")
 
     # update health functions
-    def setInfected(self, duration=14):
+    def setInfected(self, duration=140):
         self.health = Health.INFECTED
         self.infectious = True
         self.immune = True
         self.daysUntilRecovered = duration
 
-    def setSick(self, duration=14):
+    def setSick(self, duration=140):
         self.health = Health.SICK
         self.infectious = True
         self.immune = True

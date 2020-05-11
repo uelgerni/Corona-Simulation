@@ -12,12 +12,16 @@ class Area:
         return "Area " + str(self.name) + " Size = (" + str(self.xlimit) + ", " + str(self.ylimit) + ")"
 
 
+
+
 # simple location objects which know their area and can calculate a distance
 class Location:
     def __init__(self, x, y, area: Area):
         self.x = x
         self.y = y
         self.area = area
+
+
 
     def __repr__(self):
         return "({}, {})".format(self.x, self.y)
@@ -28,6 +32,9 @@ class Location:
     # euclidean distance
     def getDistance(self, x, y):
         return np.sqrt((self.x - x) ** 2 + (self.y - y) ** 2)
+
+    def getDistanceLoc(self, other):
+        return np.sqrt((self.x - other.x)**2 + (self.y - other.y)**2)
 
 #    def getDistance(self, other):
  #       return np.sqrt((self.x - other.x) ** 2 + (self.y - other.y) ** 2)
