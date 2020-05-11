@@ -56,18 +56,25 @@ class Person:
 
     # calculates the next move
     def deltaXY(self, xLimit=0, yLimit=0):
-        x, y = self.target.x, self.target.y
+        x, y = self.target.x, self.target.y # just for readability
+
+        # just to catch errors, not really needed
         if (xLimit, yLimit) == (0, 0):
             xLimit, yLimit = self.currentLocation.area.xlimit, self.currentLocation.area.ylimit
 
+        # calculates distance between current location and target
         distance = self.currentLocation.getDistance(x, y)
+        #if isolating -> dont move
         if self.isolating:
             deltaX = 0
             deltaY = 0
-        elif self.currentLocation.x > .9 * xLimit or self.currentLocation.y > .9 * yLimit:  # sets movement for next move to min of current distance and maximum movement in the current direction
+        # if close to the close to the border get new target
+        elif self.currentLocation.x > .9 * xLimit or self.currentLocation.y > .9 * yLimit:
             self.setTarget(randomLocation(self.currentLocation.area))
             deltaX = (x - self.currentLocation.x) / distance * self.speed
             deltaY = (y - self.currentLocation.y) / distance * self.speed
+
+        # else just go "speed" distance towards current target
         else:
             deltaX = (x - self.currentLocation.x) / distance * self.speed
             deltaY = (y - self.currentLocation.y) / distance * self.speed
