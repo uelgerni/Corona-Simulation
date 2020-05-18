@@ -3,12 +3,11 @@ import random
 
 
 class Area:
-    def __init__(self, xlimit, ylimit, xlowerlimit=0, ylowerlimit=0, name="Testarea"):
+    def __init__(self, xlimit, ylimit, xlowerlimit=0, ylowerlimit=0):
         self.xlimit = xlimit
         self.ylimit = ylimit
         self.xlowerlimit = xlowerlimit
         self.ylowerlimit = ylowerlimit
-        self.name = name
 
     def __str__(self):
         return "Area " + str(self.name) + " Size = (" + str(self.xlimit) + ", " + str(self.ylimit) + ")"
@@ -36,10 +35,10 @@ class Location:
         result = np.sqrt((self.x - other.x) ** 2 + (self.y - other.y) ** 2)
         return result
 
-
     def getCopy(self):
         result = Location(self.x, self.y, self.area)
         return result
+
 
 def randomLocation(area: Area):
     x = random.uniform(area.xlowerlimit, area.xlimit)

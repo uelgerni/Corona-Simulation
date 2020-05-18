@@ -11,6 +11,7 @@ from Person import *
 import time
 from BasicSim import *
 
+
 def initializeSD(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimit, ylowerlimit, yLimit, SDPercentage):
     population = initialize(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimit, ylowerlimit, yLimit)
     SDNum = int(np.floor(popSize * SDPercentage / 100))
@@ -19,4 +20,3 @@ def initializeSD(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimi
     for index in SDPeople:
         population.at[index, 'Person'].doSocialDistancing()
     return population
-

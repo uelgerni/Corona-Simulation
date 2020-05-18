@@ -8,12 +8,11 @@ import time
 
 # normal scenario, no social distancing or borders
 # testing parameters for all sims
-n = 100
-iPerc = 10  # percentage infected with no symptoms start
-sPerc = 5  # percentage sick at start, those two groups will sometimes have an overlap, ergo fewer infected than infectedPercentage*n/100
+n = 5
+
 xlowerlim, xLim, ylowerlim, yLim = 500, 1000, 0, 800  # area size
-contagionDist = 10  # distance where spread is possible
-contagionP = 50  # chance to spread when in reach
+contagionDist = 25  # distance where spread is possible
+contagionP = 10  # chance to spread when in reach
 
 
 def initialize(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimit, ylowerlimit, yLimit):
@@ -44,7 +43,7 @@ def initialize(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimit,
     return population
 
 
-def updatePop(pop: pd.DataFrame, ):
+def updatePop(pop: pd.DataFrame, lockdownFlag):
     # infecting
     for person in pop['Person']:
         if not person.infectious:
@@ -52,7 +51,7 @@ def updatePop(pop: pd.DataFrame, ):
         else:
             pop['Person'].apply(lambda z: z.setInfected() if checkForInfect(z, person) else z)
     # updating dataframe
-    pop['Person'].apply(Person.update)
+    pop['Person'].apply(lambda z: z.update(lockdownFlag))
     pop['xCoord'], pop['yCoord'] = \
         pop['Person'].apply(lambda z: z.currentLocation.x), pop['Person'].apply(lambda z: z.currentLocation.y)
 
@@ -73,7 +72,7 @@ def checkForInfect(z, person):
     return False
 
 
-def simulation(poplist):
+def simulation(population, lockdownFlag):
     pygame.init()
     FPS = 144  # frames per second setting
     fpsClock = pygame.time.Clock()
@@ -91,12 +90,11 @@ def simulation(poplist):
                     run = False
             elif event.type == pygame.QUIT:
                 run = False
-        for population in poplist:
-            updatePop(population)
+        updatePop(population, lockdownFlag)
 
         # white background
         win.fill((255, 255, 255))
-        draw(poplist, win)
+        draw(population, win)
 
         pygame.display.update()
         fpsClock.tick(FPS)
@@ -105,13 +103,11 @@ def simulation(poplist):
     exit()
 
 
-def draw(poplist, win):
-    for population in poplist:
-        for i in range(n):
-            x = int(np.floor(population.at[i, 'Person'].currentLocation.x))
-            y = int(np.floor(population.at[i, 'Person'].currentLocation.y))
-            color = population.at[i, 'Person'].getColor()
+def draw(population, win):
+    for i in range(len(population)):
+        x = int(np.floor(population.at[i, 'Person'].currentLocation.x))
+        y = int(np.floor(population.at[i, 'Person'].currentLocation.y))
+        color = population.at[i, 'Person'].getColor()
 
-            pygame.draw.circle(win, color, (x, y), 10)
-            pygame.draw.line(win, pygame.Color(0, 0, 0), (500, 0), (500, 800))
-            # pygame.display.update()
+        pygame.draw.circle(win, color, (x, y), 10)
+        pygame.draw.line(win, pygame.Color(0, 0, 0), (500, 0), (500, 800))

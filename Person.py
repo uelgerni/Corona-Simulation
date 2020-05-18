@@ -26,6 +26,7 @@ class Person:
     id = 0
 
     def __init__(self, currentLocation: Location, speed=7):
+        # giving and incrementing ID
         self.id = Person.id
         Person.id = Person.id + 1
         self.name = "Person number" + str(self.id)
@@ -33,8 +34,7 @@ class Person:
         # movement related stuff
         self.speed = speed  # distance Person can move in one cycle
         self.currentLocation = Location(currentLocation.x, currentLocation.y, currentLocation.area)
-        # initializing random target
-        # self.target = randomLocation(self.currentLocation.area)
+        # initializing random target location
         self.target = targetlocation(self.currentLocation.area)
 
         # health related stuff
@@ -79,14 +79,6 @@ class Person:
 
         return deltaX, deltaY
 
-    # checks whether a target is in the current area
-    #    def isMoveLegit(self, x, y):
-    #
-    #        if self.currentLocation.area.xlimit > self.currentLocation.x + x > self.currentLocation.area.xlowerlimit \
-    #                and self.currentLocation.area.ylowerlimit < self.currentLocation.y + y < self.currentLocation.area.ylimit :
-    #            return True
-    #        return False
-
     # moves self
     def move(self, deltaX, deltaY):
 
@@ -97,10 +89,10 @@ class Person:
     def setTarget(self, target: Location):
         self.target = target.getCopy()
 
-    def updatePos(self):
+    def updatePos(self, lockdownFlag):
         if not (self.health is Health.DEAD or self.health is Health.CRITICAL or self.sociald is True):
             if Location.getDistance(self=self.currentLocation, x=self.target.x, y=self.target.y) < self.speed:
-                self.setTarget(targetlocation(self.currentLocation.area))
+                self.setTarget(targetlocation(self.currentLocation.area, lockdownFlag))
             self.move(self.deltaXY()[0], self.deltaXY()[1])
 
     def updateHealth(self):
@@ -137,9 +129,9 @@ class Person:
                 self.setCritical()
                 self.daysUntilRecovered += 100
 
-    def update(self):
+    def update(self, lockdownFlag):
         self.updateHealth()
-        self.updatePos()
+        self.updatePos(lockdownFlag)
 
     # returns a color based on health status for the animation
     def getColor(self):
@@ -198,8 +190,3 @@ class Person:
 
     def doSocialDistancing(self):
         self.sociald = True
-
-    # def exposedToVirus(self):
-    #   for other in
-    #      x=getDistanceLoc(self,other )
-    # if self.health == Health.HEALTHY and
