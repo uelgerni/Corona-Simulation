@@ -24,5 +24,5 @@ def basicSim():
     simulation(poplist)
 
 
-basicSim()
-# SocialDistancing()
+# basicSim()
+SocialDistancing()

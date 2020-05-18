@@ -12,7 +12,7 @@ from Person import *
 # from matplotlib.animation import FuncAnimation as anim
 import pandas as pd
 import time
-from Pygamtesttarget import *
+from BasicSim import *
 
 def initializeSD(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimit, ylowerlimit, yLimit, SDPercentage):
     population = initialize(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimit, ylowerlimit, yLimit)
