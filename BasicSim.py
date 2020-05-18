@@ -14,7 +14,6 @@ xlowerlim, xLim, ylowerlim, yLim = 500, 1000, 0, 800  # area size
 contagionDist = 25  # distance where spread is possible
 contagionP = 10  # chance to spread when in reach
 
-
 def initialize(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimit, ylowerlimit, yLimit):
     area = Area(xlowerlimit=xlowerlimit, xlimit=xLimit, ylowerlimit=ylowerlimit, ylimit=yLimit)  # testarea
     population = pd.DataFrame(columns=('Person', 'xCoord', 'yCoord', 'Health'))
