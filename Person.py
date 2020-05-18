@@ -2,6 +2,7 @@ from enum import Enum
 from Area import *
 
 
+
 # different health states as enum
 
 class Health(Enum):
@@ -16,11 +17,8 @@ class Health(Enum):
 """
 This class saves all the data we need to know about a person for our simulation
 It counts person objects and gives a corresponding ID to each person
-
 variables include a name, id, speed and current location, target location and several health stats
-
 methods include "health setters", movement, a roll for dieing, getColor for a color corresponding to health status
-
 """
 
 
@@ -28,7 +26,7 @@ class Person:
     # static counter to easily keep track of person ID's
     id = 0
 
-    def __init__(self, currentLocation: Location, speed=2):
+    def __init__(self, currentLocation: Location, speed=7):
         self.id = Person.id
         Person.id = Person.id + 1
         self.name = "Person number" + str(self.id)
@@ -37,7 +35,8 @@ class Person:
         self.speed = speed  # distance Person can move in one cycle
         self.currentLocation = Location(currentLocation.x, currentLocation.y, currentLocation.area)
         # initializing random target
-        self.target = randomLocation(self.currentLocation.area)
+        #self.target = randomLocation(self.currentLocation.area)
+        self.target = targetlocation(self.currentLocation.area)
 
         # health related stuff
         self.health = Health.HEALTHY
@@ -45,6 +44,7 @@ class Person:
         self.infectious = False
         self.immune = False
         self.daysUntilRecovered = -1  # initially not recovering since healthy
+        self.sociald = False
 
     # just a simple string representation for more beautiful logs
     def __str__(self):
@@ -55,8 +55,8 @@ class Person:
             self.health.value)
 
     # calculates the next move
-    def deltaXY(self, xLimit=0, yLimit=0):
-        x, y = self.target.x, self.target.y # just for readability
+    def deltaXY(self, xLimit=0, xlowerlimit=0, ylowerlimit=0, yLimit=0):
+        x, y = self.target.x, self.target.y  # just for readability
 
         # just to catch errors, not really needed
         if (xLimit, yLimit) == (0, 0):
@@ -64,13 +64,12 @@ class Person:
 
         # calculates distance between current location and target
         distance = self.currentLocation.getDistance(x, y)
-        #if isolating -> dont move
+        # if isolating -> dont move
         if self.isolating:
             deltaX = 0
             deltaY = 0
-        # if close to the close to the border get new target
-        elif self.currentLocation.x > .9 * xLimit or self.currentLocation.y > .9 * yLimit:
-            self.setTarget(randomLocation(self.currentLocation.area))
+        #just walk the rest ;)
+        if distance < self.speed:
             deltaX = (x - self.currentLocation.x) / distance * self.speed
             deltaY = (y - self.currentLocation.y) / distance * self.speed
 
@@ -82,30 +81,30 @@ class Person:
         return deltaX, deltaY
 
     # checks whether a target is in the current area
-    def isMoveLegit(self, x, y):
-
-        if self.currentLocation.area.xlimit > self.currentLocation.x + x > 0 \
-                and 0 < self.currentLocation.y + y < self.currentLocation.area.ylimit:
-            return True
-        return False
+#    def isMoveLegit(self, x, y):
+#
+#        if self.currentLocation.area.xlimit > self.currentLocation.x + x > self.currentLocation.area.xlowerlimit \
+#                and self.currentLocation.area.ylowerlimit < self.currentLocation.y + y < self.currentLocation.area.ylimit :
+#            return True
+#        return False
 
     # moves if goal is in current area, else raises exception
     def move(self, deltaX, deltaY):
-        if self.isMoveLegit(deltaX, deltaY):
+#        if self.isMoveLegit(deltaX, deltaY):
             self.currentLocation.x += deltaX
             self.currentLocation.y += deltaY
-        else:
-            print("DelXY to big probs")
-            raise Exception
+#        else:
+#            print("DelXY to big probs")
+#            raise Exception
 
     # update target location
     def setTarget(self, target: Location):
         self.target = target.getCopy()
 
     def updatePos(self):
-        if not (self.health is Health.DEAD or self.health is Health.CRITICAL):
-            if Location.getDistance(self=self.currentLocation, x=self.target.x, y=self.target.y) < 5:
-                self.setTarget(randomLocation(self.currentLocation.area))
+        if not (self.health is Health.DEAD or self.health is Health.CRITICAL or self.sociald is True):
+            if Location.getDistance(self=self.currentLocation, x=self.target.x, y=self.target.y) < self.speed:
+                self.setTarget(targetlocation(self.currentLocation.area))
             self.move(self.deltaXY()[0], self.deltaXY()[1])
 
     def updateHealth(self):
@@ -113,9 +112,6 @@ class Person:
             self.daysUntilRecovered -= 1
         if self.daysUntilRecovered == 0:
             self.setRecovered()
-        if self.health is Health.INFECTED:
-            if random.random() < 0.1:
-                self.setSick()
         self.hospitalRoll()
         self.deathRoll()
 
@@ -124,26 +120,26 @@ class Person:
             chance = random.random()
 
             if self.health is Health.INFECTED:
-                if chance < .001:
+                if chance < .0001:
                     self.setDead()
             elif self.health is Health.SICK:
-                if chance < .005:
+                if chance < .0005:
                     self.setDead()
             else:  # else person should be in critical condition
-                if chance < .01:
+                if chance < .001:
                     self.setDead()
 
     # low chance to enter critical state. will increase recovery time by 10 days if entering critical state
     def hospitalRoll(self):
         chance = random.random()
         if self.health is Health.INFECTED:
-            if chance < .03:
+            if chance < .003:
                 self.setCritical()
-                self.daysUntilRecovered += 10
+                self.daysUntilRecovered += 100
         if self.health is Health.SICK:
-            if chance < .06:
+            if chance < .006:
                 self.setCritical()
-                self.daysUntilRecovered += 10
+                self.daysUntilRecovered += 100
 
     def update(self):
         self.updateHealth()
@@ -152,28 +148,34 @@ class Person:
     # returns a color based on health status for the animation
     def getColor(self):
         if self.health is Health.HEALTHY:
-            return 'green'
+            c = (0, 255, 0)
+            return c
         elif self.health is Health.INFECTED:
-            return 'yellow'
+            c = (255, 215, 0)
+            return c
         elif self.health is Health.SICK:
-            return 'orange'
+            c = (255, 135, 0)
+            return c
         elif self.health is Health.CRITICAL:
-            return 'red'
+            c = (255, 0, 0)
+            return c
         elif self.health is Health.RECOVERED:
-            return 'blue'
+            c = (0, 0, 255)
+            return c
         elif self.health is Health.DEAD:
-            return 'gray'
+            c = (0, 0, 0)
+            return c
         else:
             raise Exception("something went wrong with getColor in Person")
 
     # update health functions
-    def setInfected(self, duration=10):
+    def setInfected(self, duration=200):
         self.health = Health.INFECTED
         self.infectious = True
         self.immune = True
         self.daysUntilRecovered = duration
 
-    def setSick(self, duration=10):
+    def setSick(self, duration=200):
         self.health = Health.SICK
         self.infectious = True
         self.immune = True
@@ -197,3 +199,12 @@ class Person:
         self.immune = True
         self.daysUntilRecovered = -1  # just in case
         self.isolating = False
+
+    def doSocialDistancing(self):
+        self.sociald = True
+
+    #def exposedToVirus(self):
+     #   for other in
+      #      x=getDistanceLoc(self,other )
+       # if self.health == Health.HEALTHY and
+
