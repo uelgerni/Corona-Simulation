@@ -7,7 +7,7 @@ import pandas as pd
 import time
 
 # normal scenario, no social distancing or borders
-# testing parameters for sim
+# testing parameters for all sims
 n = 100
 iPerc = 10  # percentage infected with no symptoms start
 sPerc = 5  # percentage sick at start, those two groups will sometimes have an overlap, ergo fewer infected than infectedPercentage*n/100

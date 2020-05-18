@@ -1,7 +1,7 @@
 
 from SocialDistancing import *
 
-# testing parameters for sim
+# testing parameters for sim get imported since they are needed in BasicSim anyways
 
 
 def SocialDistancing():
