@@ -10,7 +10,6 @@ import pygame
 from Person import *
 # import matplotlib.pyplot as plt
 # from matplotlib.animation import FuncAnimation as anim
-import pandas as pd
 import time
 from BasicSim import *
 
