@@ -2,7 +2,6 @@ from enum import Enum
 from Area import *
 
 
-
 # different health states as enum
 
 class Health(Enum):
@@ -35,7 +34,7 @@ class Person:
         self.speed = speed  # distance Person can move in one cycle
         self.currentLocation = Location(currentLocation.x, currentLocation.y, currentLocation.area)
         # initializing random target
-        #self.target = randomLocation(self.currentLocation.area)
+        # self.target = randomLocation(self.currentLocation.area)
         self.target = targetlocation(self.currentLocation.area)
 
         # health related stuff
@@ -68,7 +67,7 @@ class Person:
         if self.isolating:
             deltaX = 0
             deltaY = 0
-        #just walk the rest ;)
+        # just walk the rest ;)
         if distance < self.speed:
             deltaX = (x - self.currentLocation.x) / distance * self.speed
             deltaY = (y - self.currentLocation.y) / distance * self.speed
@@ -81,21 +80,18 @@ class Person:
         return deltaX, deltaY
 
     # checks whether a target is in the current area
-#    def isMoveLegit(self, x, y):
-#
-#        if self.currentLocation.area.xlimit > self.currentLocation.x + x > self.currentLocation.area.xlowerlimit \
-#                and self.currentLocation.area.ylowerlimit < self.currentLocation.y + y < self.currentLocation.area.ylimit :
-#            return True
-#        return False
+    #    def isMoveLegit(self, x, y):
+    #
+    #        if self.currentLocation.area.xlimit > self.currentLocation.x + x > self.currentLocation.area.xlowerlimit \
+    #                and self.currentLocation.area.ylowerlimit < self.currentLocation.y + y < self.currentLocation.area.ylimit :
+    #            return True
+    #        return False
 
-    # moves if goal is in current area, else raises exception
+    # moves self
     def move(self, deltaX, deltaY):
-#        if self.isMoveLegit(deltaX, deltaY):
-            self.currentLocation.x += deltaX
-            self.currentLocation.y += deltaY
-#        else:
-#            print("DelXY to big probs")
-#            raise Exception
+
+        self.currentLocation.x += deltaX
+        self.currentLocation.y += deltaY
 
     # update target location
     def setTarget(self, target: Location):
@@ -203,8 +199,7 @@ class Person:
     def doSocialDistancing(self):
         self.sociald = True
 
-    #def exposedToVirus(self):
-     #   for other in
-      #      x=getDistanceLoc(self,other )
-       # if self.health == Health.HEALTHY and
-
+    # def exposedToVirus(self):
+    #   for other in
+    #      x=getDistanceLoc(self,other )
+    # if self.health == Health.HEALTHY and

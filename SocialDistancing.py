@@ -2,10 +2,8 @@
 """
 Created on Wed May 13 13:27:28 2020
 
-@author: Suri
+@author: Suri Volz, Niklas Mäschke, Nicolai Ülger
 """
-
-import pygame
 
 from Person import *
 # import matplotlib.pyplot as plt
