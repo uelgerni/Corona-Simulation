@@ -3,15 +3,15 @@ import random
 
 
 class Area:
-    def __init__(self, xlimit, ylimit, name="Testarea"):
+    def __init__(self, xlimit, ylimit, xlowerlimit=0, ylowerlimit=0, name="Testarea"):
         self.xlimit = xlimit
         self.ylimit = ylimit
+        self.xlowerlimit = xlowerlimit
+        self.ylowerlimit = ylowerlimit
         self.name = name
 
     def __str__(self):
         return "Area " + str(self.name) + " Size = (" + str(self.xlimit) + ", " + str(self.ylimit) + ")"
-
-
 
 
 # simple location objects which know their area and can calculate a distance
@@ -21,8 +21,6 @@ class Location:
         self.y = y
         self.area = area
 
-
-
     def __repr__(self):
         return "({}, {})".format(self.x, self.y)
 
@@ -31,20 +29,31 @@ class Location:
 
     # euclidean distance
     def getDistance(self, x, y):
-        return np.sqrt((self.x - x) ** 2 + (self.y - y) ** 2)
+        result = np.sqrt((self.x - x) ** 2 + (self.y - y) ** 2)
+        return result
 
     def getDistanceLoc(self, other):
-        return np.sqrt((self.x - other.x)**2 + (self.y - other.y)**2)
+        result = np.sqrt((self.x - other.x) ** 2 + (self.y - other.y) ** 2)
+        return result
 
-#    def getDistance(self, other):
- #       return np.sqrt((self.x - other.x) ** 2 + (self.y - other.y) ** 2)
 
     def getCopy(self):
-        return Location(self.x, self.y, self.area)
+        result = Location(self.x, self.y, self.area)
+        return result
 
-
-# gives a random location inside a given area
 def randomLocation(area: Area):
-    x = random.uniform(0, area.xlimit)
-    y = random.uniform(0, area.ylimit)
+    x = random.uniform(area.xlowerlimit, area.xlimit)
+    y = random.uniform(area.ylowerlimit, area.ylimit)
     return Location(x, y, area)
+
+
+allowedareas = [Area(500, 1000, 0, 800), Area(0, 1000, 0, 800)]
+
+
+def targetlocation(area: Area, lockdown=True):
+    chance = random.random()
+    perc = .01 if lockdown else .5
+    if chance > perc:
+        return randomLocation(area)
+    else:
+        return randomLocation(random.choice(allowedareas))
