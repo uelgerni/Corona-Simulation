@@ -149,4 +149,19 @@ def draw(population, win, stats, lockdownFlag):
         pygame.draw.lines(win, (255, 215, 0), False, stats[0], 3)  # infections surface, color, closed, data, width
         pygame.draw.lines(win, (255, 0, 0), False, stats[1], 3)  # critical
 
-      
+        # our legend
+        font = pygame.font.SysFont('Comic Sans MS', 30)
+        healthyText = font.render('Healthy', True, (0, 255, 0))
+        infectedText = font.render('Infected', True, (255, 215, 0))
+        sickText = font.render('Sick', True, (255, 135, 0))
+        criticalText = font.render('Critical', True, (255, 0, 0))
+        deadText = font.render('Dead', True, (0, 0, 255))
+        recoveredText = font.render('Recovered', True, (0, 0, 0))
+
+        # blitting onto our main window
+        win.blit(healthyText, (0, 0))
+        win.blit(infectedText, (0, 20))
+        win.blit(sickText, (0, 40))
+        win.blit(criticalText, (0, 60))
+        win.blit(deadText, (0, 80))
+        win.blit(recoveredText, (0, 100))
