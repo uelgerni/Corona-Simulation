@@ -25,7 +25,7 @@ class Person:
     # static counter to easily keep track of person ID's
     id = 0
 
-    def __init__(self, currentLocation: Location, speed=7):
+    def __init__(self, currentLocation: Location, speed=4):
         # giving and incrementing ID
         self.id = Person.id
         Person.id = Person.id + 1
