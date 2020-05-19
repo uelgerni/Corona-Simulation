@@ -46,7 +46,7 @@ def randomLocation(area: Area):
     return Location(x, y, area)
 
 
-xlowerlim, xLim, ylowerlim, yLim = 300, 600, 0, 400  # area size
+xlowerlim, xLim, ylowerlim, yLim = 400, 800, 0, 600  # area size
 allowedareas = [Area(xlowerlimit=xlowerlim, xlimit=xLim, ylowerlimit=ylowerlim, ylimit=yLim),
                 Area(xlowerlimit=0, xlimit=xLim, ylowerlimit=ylowerlim, ylimit=yLim)]
 

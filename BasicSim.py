@@ -80,9 +80,6 @@ def checkForInfect(z, person):
 def simulation(population, lockdownFlag):
     # initializing pygame
     pygame.init()
-    # initialize our legend
-    pygame.font.init()
-    font = pygame.font.SysFont('Arial', 20)
 
     # frame settings and window init
     FPS = 144  # frames per second setting
@@ -149,5 +146,7 @@ def draw(population, win, stats, lockdownFlag):
         pygame.draw.line(win, pygame.Color(0, 0, 0), (0, 203), (xLim, 203))
 
         # drawing stats above sim
-        pygame.draw.lines(win, (255, 215, 0), False, stats[0])  # infections surface, color, closed, data
-        pygame.draw.lines(win, (255, 0, 0), False, stats[1])  # critical
+        pygame.draw.lines(win, (255, 215, 0), False, stats[0], 3)  # infections surface, color, closed, data, width
+        pygame.draw.lines(win, (255, 0, 0), False, stats[1], 3)  # critical
+
+      
