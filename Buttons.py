@@ -11,7 +11,11 @@ pygame.init()
 screen = pygame.display.set_mode((600, 400))
 font = pygame.font.SysFont('Arial', 20)
 active = False
-lockdownFlag = True
+lockdownFlag = False
+
+
+
+
 
 def textobjects(text, font):
     textsurface = font.render(text, True, (0, 0, 0))
@@ -21,6 +25,8 @@ def textobjects(text, font):
 def button(x, y, label, length, height, standard_colour, active_colour, border):
     global active
     global lockdownFlag
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
     if x < mouse[0] < x + length and y < mouse[1] < y + height:
         pygame.draw.rect(screen, active_colour, (x, y, length, height))
         if click[0] == 1 and not active:
@@ -78,22 +84,4 @@ def button(x, y, label, length, height, standard_colour, active_colour, border):
     screen.blit(textground, textbox)
 
 
-run = True
-active = False
-lockdownFlag = False
-while run:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-            pygame.quit()
-    screen.fill((255, 255, 255))
-    mouse = pygame.mouse.get_pos()
-    click = pygame.mouse.get_pressed()
-    button(10, 10, "Standard Simulation", 200, 60, (79, 148, 205), (99, 184, 255), 1)
-    button(250, 10, "Social Distancing 20%", 220, 60, (79, 148, 205), (99, 184, 255), 1)
-    button(10, 100, "Social Distancing 40%", 220, 60, (79, 148, 205), (99, 184, 255), 1)
-    button(10, 200, "Exit", 100, 60, (205, 0, 0), (255, 0, 0), 1)
-    button(250, 100, "Lockdown", 120, 60, (205, 0, 0), (255, 0, 0), 1)
-    pygame.display.update()
 
-pygame.quit()

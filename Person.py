@@ -34,6 +34,8 @@ class Person:
         # movement related stuff
         self.speed = speed  # distance Person can move in one cycle
         self.currentLocation = Location(currentLocation.x, currentLocation.y, currentLocation.area)
+        self.sociald = False  # if sociald -> dont move
+
         # initializing random target location
         self.target = targetlocation(self.currentLocation.area, lockdownFlag=True)
 
@@ -43,9 +45,8 @@ class Person:
         self.infectious = False
         self.immune = False
         self.daysUntilRecovered = -1  # initially not recovering since healthy
-        self.sociald = False
 
-    # just a simple string representation for more beautiful logs
+    # just a simple string representation
     def __str__(self):
         return "Person " + str(self.id)
 
@@ -81,21 +82,22 @@ class Person:
 
     # moves self
     def move(self, deltaX, deltaY):
-
         self.currentLocation.x += deltaX
         self.currentLocation.y += deltaY
 
-    # update target location
+    # set target location
     def setTarget(self, target: Location):
         self.target = target.getCopy()
 
+    # if able to move check whether you're less than one move from your target, if so: set a new target.
+    # then move
     def updatePos(self, lockdownFlag):
         if not (self.health is Health.DEAD or self.health is Health.CRITICAL or self.sociald is True):
             if Location.getDistance(self=self.currentLocation, x=self.target.x, y=self.target.y) < self.speed:
                 self.setTarget(targetlocation(self.currentLocation.area, lockdownFlag))
-                print(self.currentLocation.area)
             self.move(self.deltaXY()[0], self.deltaXY()[1])
 
+    # one day closer to recovery, and if duration is over -> recover
     def updateHealth(self):
         if self.daysUntilRecovered > 0:
             self.daysUntilRecovered -= 1
@@ -104,6 +106,7 @@ class Person:
         self.hospitalRoll()
         self.deathRoll()
 
+    # low chance to die each tick, higher the more serious the infection is
     def deathRoll(self):
         if self.infectious:
             chance = random.random()
@@ -118,17 +121,17 @@ class Person:
                 if chance < .001:
                     self.setDead()
 
-    # low chance to enter critical state. will increase recovery time by 10 days if entering critical state
+    # low chance to enter critical state. will increase recovery time by 50% of total if entering critical state
     def hospitalRoll(self):
         chance = random.random()
         if self.health is Health.INFECTED:
             if chance < .003:
                 self.setCritical()
-                self.daysUntilRecovered += 50
+                self.daysUntilRecovered += duration / 2
         if self.health is Health.SICK:
             if chance < .006:
                 self.setCritical()
-                self.daysUntilRecovered += 50
+                self.daysUntilRecovered += duration / 2
 
     def update(self, lockdownFlag):
         self.updateHealth()
@@ -158,13 +161,13 @@ class Person:
             raise Exception("something went wrong with getColor in Person")
 
     # update health functions
-    def setInfected(self, duration=100):
+    def setInfected(self, duration=duration):
         self.health = Health.INFECTED
         self.infectious = True
         self.immune = True
         self.daysUntilRecovered = duration
 
-    def setSick(self, duration=100):
+    def setSick(self, duration=duration):
         self.health = Health.SICK
         self.infectious = True
         self.immune = True

@@ -7,9 +7,12 @@ import pandas as pd
 import time
 import numpy as np
 
-# normal scenario, no social distancing or borders
+"""
+This is the basic simulation
 
-
+In here are the methods to initialize a population, update that population for each tick, the simulation method, which
+controls the ticks
+"""
 
 
 def initialize(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimit, ylowerlimit, yLimit, name="name"):
@@ -75,26 +78,27 @@ def simulation(population, lockdownFlag):
     pygame.init()
 
     # frame settings and window init
-    FPS = 144  # frames per second setting
+    FPS = 60  # frames per second setting
     fpsClock = pygame.time.Clock()
     win = pygame.display.set_mode((xLim + 10, yLim + 220))  # more space in y direction for stats and legend
 
     # caption
     pygame.display.set_caption("Corona Simulation")
-    run = True
 
     # initializing our stat arrays, 0 is at top, so 200 is our "new zero"
     infections, critical = np.array([200]), np.array([200])
 
-    while run:
+    while True:
         pygame.time.delay(0)
         # if escape is pressed or the X button on the top right it closes the window and ends the simulation
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    run = False
+                    pygame.quit()
+                    exit("pressed escape to exit")
             elif event.type == pygame.QUIT:
-                run = False
+                pygame.quit()
+                exit("eventtype pygame.QUIT")
 
         # updatePop updates pop and returns health data
         data = updatePop(population, lockdownFlag)
@@ -123,6 +127,11 @@ def simulation(population, lockdownFlag):
     exit()
 
 
+"""
+The plotting function
+"""
+
+
 def draw(population, win, stats, lockdownFlag):
     # our legend
     font = pygame.font.SysFont('Comic Sans MS', 30)
@@ -130,9 +139,10 @@ def draw(population, win, stats, lockdownFlag):
     infectedText = font.render('Infected', True, (255, 215, 0))
     sickText = font.render('Sick', True, (255, 135, 0))
     criticalText = font.render('Critical', True, (255, 0, 0))
-    deadText = font.render('Dead', True, (0, 0, 255))
-    recoveredText = font.render('Recovered', True, (0, 0, 0))
+    deadText = font.render('Recovered', True, (0, 0, 255))
+    recoveredText = font.render('Dead', True, (0, 0, 0))
 
+    # plot the population
     for i in range(len(population)):
         x = int(np.floor(population.at[i, 'Person'].currentLocation.x))
         y = int(np.floor(population.at[i, 'Person'].currentLocation.y))
@@ -141,21 +151,20 @@ def draw(population, win, stats, lockdownFlag):
         # draw the pop
         pygame.draw.circle(win, color, (x + 5, y + 208), 10)
 
-        # all the +5's are for borders around the edges
-    # border between areas, thick if lockdownFlag
+    # border between areas, thick if lockdownFlag.
     width = 3 if lockdownFlag else 1
-    pygame.draw.line(win, pygame.Color(0, 0, 0), (xlowerlim + 3, 203), (xlowerlim + 3, yLim + 215), width)
-    # borders around it all
+    pygame.draw.line(win, pygame.Color(0, 0, 0), (xlowerlim + 3, 205), (xlowerlim + 3, yLim + 215), width)
+    # borders around it all. All the +5's are for borders near edges
     pygame.draw.line(win, pygame.Color(0, 0, 0), (5, 205), (xLim + 5, 205), 3)  # top
     pygame.draw.line(win, pygame.Color(0, 0, 0), (5, yLim + 215), (xLim + 5, yLim + 215), 3)  # bottom
     pygame.draw.line(win, pygame.Color(0, 0, 0), (5, 205), (5, yLim + 215), 3)  # left
-    pygame.draw.line(win, pygame.Color(0, 0, 0), (xLim + 5, 205), (xLim + 5, yLim + 215), 3) #right
+    pygame.draw.line(win, pygame.Color(0, 0, 0), (xLim + 5, 205), (xLim + 5, yLim + 215), 3)  # right
 
     # drawing stats above sim
     pygame.draw.lines(win, (255, 215, 0), False, stats[0], 3)  # infections surface, color, closed, data, width
     pygame.draw.lines(win, (255, 0, 0), False, stats[1], 3)  # critical
 
-    # blitting onto our main window
+    # blitting the legend onto our main window
     win.blit(healthyText, (0, 0))
     win.blit(infectedText, (0, 20))
     win.blit(sickText, (0, 40))

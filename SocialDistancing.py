@@ -7,8 +7,9 @@ Created on Wed May 13 13:27:28 2020
 
 from BasicSim import *
 
-def initializeSD(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimit, ylowerlimit, yLimit, SDPercentage, name="name"):
-    population = initialize(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimit, ylowerlimit, yLimit, name=name)
+
+def initializeSD(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimit, ylowerlimit, yLimit, SDPercentage):
+    population = initialize(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimit, ylowerlimit, yLimit)
     SDNum = int(np.floor(popSize * SDPercentage / 100))
     SDPeople = population.sample(n=SDNum).index.values.tolist()
 
