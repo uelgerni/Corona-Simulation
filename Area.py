@@ -1,13 +1,14 @@
 import numpy as np
 import random
-
+from Params import *
 
 class Area:
-    def __init__(self, xlimit, ylimit, xlowerlimit=0, ylowerlimit=0):
+    def __init__(self, xlimit, ylimit, xlowerlimit=0, ylowerlimit=0, name="name"):
         self.xlimit = xlimit
         self.ylimit = ylimit
         self.xlowerlimit = xlowerlimit
         self.ylowerlimit = ylowerlimit
+        self.name = name
 
     def __str__(self):
         return "Area " + str(self.name) + " Size = (" + str(self.xlimit) + ", " + str(self.ylimit) + ")"
@@ -48,12 +49,12 @@ def randomLocation(area: Area):
 
 xlowerlim, xLim, ylowerlim, yLim = 400, 800, 0, 600  # area size
 allowedareas = [Area(xlowerlimit=xlowerlim, xlimit=xLim, ylowerlimit=ylowerlim, ylimit=yLim),
-                Area(xlowerlimit=0, xlimit=xLim, ylowerlimit=ylowerlim, ylimit=yLim)]
+                Area(xlowerlimit=0, xlimit=xlowerlim, ylowerlimit=ylowerlim, ylimit=yLim)]
 
 
-def targetlocation(area: Area, lockdown=True):
+def targetlocation(area: Area, lockdownFlag):
     chance = random.random()
-    perc = .01 if lockdown else .5
+    perc = 0.01 if lockdownFlag else .3
     if chance > perc:
         return randomLocation(area)
     else:

@@ -25,7 +25,7 @@ class Person:
     # static counter to easily keep track of person ID's
     id = 0
 
-    def __init__(self, currentLocation: Location, speed=4):
+    def __init__(self, currentLocation: Location, speed=5):
         # giving and incrementing ID
         self.id = Person.id
         Person.id = Person.id + 1
@@ -35,7 +35,7 @@ class Person:
         self.speed = speed  # distance Person can move in one cycle
         self.currentLocation = Location(currentLocation.x, currentLocation.y, currentLocation.area)
         # initializing random target location
-        self.target = targetlocation(self.currentLocation.area)
+        self.target = targetlocation(self.currentLocation.area, lockdownFlag=True)
 
         # health related stuff
         self.health = Health.HEALTHY
@@ -93,6 +93,7 @@ class Person:
         if not (self.health is Health.DEAD or self.health is Health.CRITICAL or self.sociald is True):
             if Location.getDistance(self=self.currentLocation, x=self.target.x, y=self.target.y) < self.speed:
                 self.setTarget(targetlocation(self.currentLocation.area, lockdownFlag))
+                print(self.currentLocation.area)
             self.move(self.deltaXY()[0], self.deltaXY()[1])
 
     def updateHealth(self):
@@ -123,11 +124,11 @@ class Person:
         if self.health is Health.INFECTED:
             if chance < .003:
                 self.setCritical()
-                self.daysUntilRecovered += 100
+                self.daysUntilRecovered += 50
         if self.health is Health.SICK:
             if chance < .006:
                 self.setCritical()
-                self.daysUntilRecovered += 100
+                self.daysUntilRecovered += 50
 
     def update(self, lockdownFlag):
         self.updateHealth()
@@ -157,13 +158,13 @@ class Person:
             raise Exception("something went wrong with getColor in Person")
 
     # update health functions
-    def setInfected(self, duration=200):
+    def setInfected(self, duration=100):
         self.health = Health.INFECTED
         self.infectious = True
         self.immune = True
         self.daysUntilRecovered = duration
 
-    def setSick(self, duration=200):
+    def setSick(self, duration=100):
         self.health = Health.SICK
         self.infectious = True
         self.immune = True

@@ -1,3 +1,1 @@
-from Buttontest import *
-
-Buttontest
+import Buttons

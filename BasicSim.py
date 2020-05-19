@@ -8,20 +8,12 @@ import time
 import numpy as np
 
 # normal scenario, no social distancing or borders
-# testing parameters for all sims
 
 
-contagionDist = 10  # distance where spread is possible
-contagionP = 100  # chance to spread when in reach
-iPerc = 2  # percentage infected with no symptoms start
-sPerc = 1  # percentage sick at start, those two groups will sometimes have an overlap, ergo fewer infected than infectedPercentage*n/100
-lockdownFlag = False
-popsize1 = 75
-popsize2 = 75
 
 
-def initialize(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimit, ylowerlimit, yLimit):
-    area = Area(xlowerlimit=xlowerlimit, xlimit=xLimit, ylowerlimit=ylowerlimit, ylimit=yLimit)  # testarea
+def initialize(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimit, ylowerlimit, yLimit, name="name"):
+    area = Area(xlowerlimit=xlowerlimit, xlimit=xLimit, ylowerlimit=ylowerlimit, ylimit=yLimit, name=name)  # testarea
     population = pd.DataFrame(columns=('Person', 'xCoord', 'yCoord', 'Health'))
     # generating a population
     for i in range(popSize):
@@ -63,6 +55,7 @@ def updatePop(pop: pd.DataFrame, lockdownFlag):
     # statistics
     numInfected = pop['Person'].apply(lambda z: 1 if z.infectious else 0).sum()
     numCritical = pop['Person'].apply(lambda z: 1 if z.health is Health.CRITICAL else 0).sum()
+    # just if you want more data, currently not used
     # numDead = pop['Person'].apply(lambda z: 1 if z.health is Health.DEAD else 0).sum()
     # numHealthy = len(pop.index) - numInfected - numDead
     # numRecovered = pop['Person'].apply(lambda z: 1 if z.health is Health.RECOVERED else 0).sum()
@@ -84,7 +77,7 @@ def simulation(population, lockdownFlag):
     # frame settings and window init
     FPS = 144  # frames per second setting
     fpsClock = pygame.time.Clock()
-    win = pygame.display.set_mode((xLim, yLim + 215))  # more space in y direction for stats and legend
+    win = pygame.display.set_mode((xLim + 10, yLim + 220))  # more space in y direction for stats and legend
 
     # caption
     pygame.display.set_caption("Corona Simulation")
@@ -106,7 +99,7 @@ def simulation(population, lockdownFlag):
         # updatePop updates pop and returns health data
         data = updatePop(population, lockdownFlag)
 
-        # save the data
+        # save the data, 200 offset and - because (0,0) is top left
         infections = np.append(infections, 200 - data[0])
         critical = np.append(critical, 200 - data[1])
 
@@ -131,37 +124,41 @@ def simulation(population, lockdownFlag):
 
 
 def draw(population, win, stats, lockdownFlag):
+    # our legend
+    font = pygame.font.SysFont('Comic Sans MS', 30)
+    healthyText = font.render('Healthy', True, (0, 255, 0))
+    infectedText = font.render('Infected', True, (255, 215, 0))
+    sickText = font.render('Sick', True, (255, 135, 0))
+    criticalText = font.render('Critical', True, (255, 0, 0))
+    deadText = font.render('Dead', True, (0, 0, 255))
+    recoveredText = font.render('Recovered', True, (0, 0, 0))
+
     for i in range(len(population)):
         x = int(np.floor(population.at[i, 'Person'].currentLocation.x))
         y = int(np.floor(population.at[i, 'Person'].currentLocation.y))
         color = population.at[i, 'Person'].getColor()
 
         # draw the pop
-        pygame.draw.circle(win, color, (x, y + 205), 10)
+        pygame.draw.circle(win, color, (x + 5, y + 208), 10)
 
-        # border between areas, thick if lockdownFlag
-        width = 3 if lockdownFlag else 1
+        # all the +5's are for borders around the edges
+    # border between areas, thick if lockdownFlag
+    width = 3 if lockdownFlag else 1
+    pygame.draw.line(win, pygame.Color(0, 0, 0), (xlowerlim + 3, 203), (xlowerlim + 3, yLim + 215), width)
+    # borders around it all
+    pygame.draw.line(win, pygame.Color(0, 0, 0), (5, 205), (xLim + 5, 205), 3)  # top
+    pygame.draw.line(win, pygame.Color(0, 0, 0), (5, yLim + 215), (xLim + 5, yLim + 215), 3)  # bottom
+    pygame.draw.line(win, pygame.Color(0, 0, 0), (5, 205), (5, yLim + 215), 3)  # left
+    pygame.draw.line(win, pygame.Color(0, 0, 0), (xLim + 5, 205), (xLim + 5, yLim + 215), 3) #right
 
-        pygame.draw.line(win, pygame.Color(0, 0, 0), (xlowerlim, 203), (xlowerlim, yLim + 215), width)
-        pygame.draw.line(win, pygame.Color(0, 0, 0), (0, 203), (xLim, 203))
+    # drawing stats above sim
+    pygame.draw.lines(win, (255, 215, 0), False, stats[0], 3)  # infections surface, color, closed, data, width
+    pygame.draw.lines(win, (255, 0, 0), False, stats[1], 3)  # critical
 
-        # drawing stats above sim
-        pygame.draw.lines(win, (255, 215, 0), False, stats[0], 3)  # infections surface, color, closed, data, width
-        pygame.draw.lines(win, (255, 0, 0), False, stats[1], 3)  # critical
-
-        # our legend
-        font = pygame.font.SysFont('Comic Sans MS', 30)
-        healthyText = font.render('Healthy', True, (0, 255, 0))
-        infectedText = font.render('Infected', True, (255, 215, 0))
-        sickText = font.render('Sick', True, (255, 135, 0))
-        criticalText = font.render('Critical', True, (255, 0, 0))
-        deadText = font.render('Dead', True, (0, 0, 255))
-        recoveredText = font.render('Recovered', True, (0, 0, 0))
-
-        # blitting onto our main window
-        win.blit(healthyText, (0, 0))
-        win.blit(infectedText, (0, 20))
-        win.blit(sickText, (0, 40))
-        win.blit(criticalText, (0, 60))
-        win.blit(deadText, (0, 80))
-        win.blit(recoveredText, (0, 100))
+    # blitting onto our main window
+    win.blit(healthyText, (0, 0))
+    win.blit(infectedText, (0, 20))
+    win.blit(sickText, (0, 40))
+    win.blit(criticalText, (0, 60))
+    win.blit(deadText, (0, 80))
+    win.blit(recoveredText, (0, 100))
