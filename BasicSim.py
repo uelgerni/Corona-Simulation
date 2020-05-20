@@ -6,14 +6,14 @@ from Person import *
 import pandas as pd
 import time
 import numpy as np
-
+from coronatest import *
+from Params import *
 """
 This is the basic simulation
-
 In here are the methods to initialize a population, update that population for each tick, the simulation method, which
 controls the ticks
 """
-
+coronatest = Coronatest(testcap,testper)
 
 def initialize(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimit, ylowerlimit, yLimit, name="name"):
     area = Area(xlowerlimit=xlowerlimit, xlimit=xLimit, ylowerlimit=ylowerlimit, ylimit=yLimit, name=name)  # testarea
@@ -44,12 +44,17 @@ def initialize(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimit,
 
 
 def updatePop(pop: pd.DataFrame, lockdownFlag):
-    # infecting
+    coronatest.update()
+    # infecting and testing
     for person in pop['Person']:
         if not person.infectious:
             pass
         else:
             pop['Person'].apply(lambda z: z.setInfected() if checkForInfect(z, person) else z)
+        if coronatest.persontest(person.health) is Testresult.INFECTED:
+            person.testpos = True
+
+
     # updating dataframe
     pop['Person'].apply(lambda z: z.update(lockdownFlag))
     pop['xCoord'], pop['yCoord'] = \

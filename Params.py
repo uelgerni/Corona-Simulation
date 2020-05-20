@@ -8,3 +8,5 @@ popsize1 = 50
 popsize2 = 50
 
 duration = 100
+testcap = 30 # capscity for coronatests
+testper = 2  # how many iterations until there are new tests
