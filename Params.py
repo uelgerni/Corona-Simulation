@@ -7,7 +7,7 @@ popsize1 = 75
 popsize2 = 75
 
 duration = 150 # duration of disease if normal course of disease (sick/infected, not critical)
-testcap = 10  # capscity for coronatests
+testcap = 10  # capacity for coronatests, set to zero if you dont want testing
 testper = 2  # how many iterations until there are new tests
 
 xlowerlim, xLim, ylowerlim, yLim = 400, 800, 0, 600  # area size
