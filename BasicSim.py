@@ -124,10 +124,10 @@ def simulation(population, lockdownFlag):
 
         # lists of 2 lists of tuples, for less crowded method signatures
         # the *Stat2 are moved by half the screen to the right
-        infectionStat1, critStat1 = np.array(list(zip(x_values, infections1))), np.array(list(zip(x_values, critical1)))
+        infectionStat1, critStat1 = np.array(list(zip(x_values+5, infections1))), np.array(list(zip(x_values+5, critical1)))
         infectionStat2, critStat2 = \
-            np.array(list(zip(x_values + xLim / 2 + 3, infections2))), \
-            np.array(list(zip(x_values + xLim / 2 + 3, critical2)))
+            np.array(list(zip(x_values + xLim / 2 + 5, infections2))), \
+            np.array(list(zip(x_values + xLim / 2 + 5, critical2)))
         stats1 = (infectionStat1, critStat1)
         stats2 = (infectionStat2, critStat2)
 
@@ -183,6 +183,11 @@ def draw(population, win, stats1, stats2, lockdownFlag):
         pygame.draw.lines(win, (255, 0, 0), False, stats1[1], 3)
         pygame.draw.lines(win, (255, 215, 0), False, stats2[0], 3)
         pygame.draw.lines(win, (255, 0, 0), False, stats2[1], 3)
+    else:
+        pygame.draw.lines(win, (255, 215, 0), False, stats1[0][:int(np.floor(xLim))], 3)  # infections surface, color, closed, data, width
+        pygame.draw.lines(win, (255, 0, 0), False, stats1[1][:int(np.floor(xLim))], 3)
+        pygame.draw.lines(win, (255, 215, 0), False, stats2[0][:int(np.floor(xLim))], 3)
+        pygame.draw.lines(win, (255, 0, 0), False, stats2[1][:int(np.floor(xLim))], 3)
 
     # blitting the legend onto our main window
     win.blit(healthyText, (0, 0))

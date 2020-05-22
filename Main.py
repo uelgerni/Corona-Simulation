@@ -2,6 +2,9 @@ from Buttons import *
 
 
 def main():
+    pygame.init()
+    screen = pygame.display.set_mode((600, 400))
+    font = pygame.font.SysFont('Arial', 20)
     run = True
     while run:
         for event in pygame.event.get():
