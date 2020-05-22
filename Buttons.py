@@ -14,9 +14,6 @@ active = False
 lockdownFlag = False
 
 
-
-
-
 def textobjects(text, font):
     textsurface = font.render(text, True, (0, 0, 0))
     return textsurface, textsurface.get_rect()
@@ -82,6 +79,3 @@ def button(x, y, label, length, height, standard_colour, active_colour, border):
     textground, textbox = textobjects(label, font)
     textbox.center = (int(np.floor((x + (length / 2)))), int(np.floor(y + (height / 2))))
     screen.blit(textground, textbox)
-
-
-

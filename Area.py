@@ -2,6 +2,7 @@ import numpy as np
 import random
 from Params import *
 
+
 class Area:
     def __init__(self, xlimit, ylimit, xlowerlimit=0, ylowerlimit=0, name="name"):
         self.xlimit = xlimit
@@ -47,14 +48,13 @@ def randomLocation(area: Area):
     return Location(x, y, area)
 
 
-xlowerlim, xLim, ylowerlim, yLim = 400, 800, 0, 600  # area size
 allowedareas = [Area(xlowerlimit=xlowerlim, xlimit=xLim, ylowerlimit=ylowerlim, ylimit=yLim),
                 Area(xlowerlimit=0, xlimit=xlowerlim, ylowerlimit=ylowerlim, ylimit=yLim)]
 
 
 def targetlocation(area: Area, lockdownFlag):
     chance = random.random()
-    perc = 0.01 if lockdownFlag else .3
+    perc = 0 if lockdownFlag else .3
     if chance > perc:
         return randomLocation(area)
     else:

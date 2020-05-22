@@ -8,16 +8,19 @@ import time
 import numpy as np
 from coronatest import *
 from Params import *
+
 """
 This is the basic simulation
 In here are the methods to initialize a population, update that population for each tick, the simulation method, which
 controls the ticks
 """
-coronatest = Coronatest(testcap,testper)
+coronatest = Coronatest(testcap, testper)
+
 
 def initialize(popSize, infectedPercentage, sickPercentage, xlowerlimit, xLimit, ylowerlimit, yLimit, name="name"):
     area = Area(xlowerlimit=xlowerlimit, xlimit=xLimit, ylowerlimit=ylowerlimit, ylimit=yLimit, name=name)  # testarea
     population = pd.DataFrame(columns=('Person', 'xCoord', 'yCoord', 'Health'))
+
     # generating a population
     for i in range(popSize):
         loc = randomLocation(area)
@@ -52,22 +55,23 @@ def updatePop(pop: pd.DataFrame, lockdownFlag):
         else:
             pop['Person'].apply(lambda z: z.setInfected() if checkForInfect(z, person) else z)
         if coronatest.persontest(person.health) is Testresult.INFECTED:
-            person.testpos = True
-
+            person.testpos = True  # -> dont move
 
     # updating dataframe
     pop['Person'].apply(lambda z: z.update(lockdownFlag))
     pop['xCoord'], pop['yCoord'] = \
         pop['Person'].apply(lambda z: z.currentLocation.x), pop['Person'].apply(lambda z: z.currentLocation.y)
 
-    # statistics
-    numInfected = pop['Person'].apply(lambda z: 1 if z.infectious else 0).sum()
-    numCritical = pop['Person'].apply(lambda z: 1 if z.health is Health.CRITICAL else 0).sum()
+    # statistics, gotta split it again for plotting purposes
+    numInfected2 = pop['Person'].apply(lambda z: 1 if z.infectious and z.id < popsize1 else 0).sum()
+    numCritical2 = pop['Person'].apply(lambda z: 1 if z.health is Health.CRITICAL and z.id < popsize1 else 0).sum()
+    numInfected1 = pop['Person'].apply(lambda z: 1 if z.infectious and z.id >= popsize1 else 0).sum()
+    numCritical1 = pop['Person'].apply(lambda z: 1 if z.health is Health.CRITICAL and z.id >= popsize1 else 0).sum()
     # just if you want more data, currently not used
     # numDead = pop['Person'].apply(lambda z: 1 if z.health is Health.DEAD else 0).sum()
     # numHealthy = len(pop.index) - numInfected - numDead
     # numRecovered = pop['Person'].apply(lambda z: 1 if z.health is Health.RECOVERED else 0).sum()
-    return numInfected, numCritical
+    return numInfected1, numCritical1, numInfected2, numCritical2
 
 
 def checkForInfect(z, person):
@@ -91,7 +95,7 @@ def simulation(population, lockdownFlag):
     pygame.display.set_caption("Corona Simulation")
 
     # initializing our stat arrays, 0 is at top, so 200 is our "new zero"
-    infections, critical = np.array([200]), np.array([200])
+    infections1, critical1, infections2, critical2 = np.array([200]), np.array([200]), np.array([200]), np.array([200])
 
     while True:
         pygame.time.delay(0)
@@ -108,21 +112,28 @@ def simulation(population, lockdownFlag):
         # updatePop updates pop and returns health data
         data = updatePop(population, lockdownFlag)
 
-        # save the data, 200 offset and - because (0,0) is top left
-        infections = np.append(infections, 200 - data[0])
-        critical = np.append(critical, 200 - data[1])
+        # save the data, 200 offset and y*2 - because (0,0) is top left and it looks better scaled
+        infections1 = np.append(infections1, 200 - 2 * data[0])  # scaled y values for better visibility
+        critical1 = np.append(critical1, 200 - 2 * data[1])
+        infections2 = np.append(infections2, 200 - 2 * data[2])
+        critical2 = np.append(critical2, 200 - 2 * data[3])
 
         # for our x axis
-        n = len(infections)
-        x_values = np.arange(n) + 1
+        n = len(infections1)
+        x_values = np.array(np.arange(n) + 1) / 2
 
-        # list of 2 lists of tuples, for less crowded method signatures
-        infectionStat, critStat = np.array(list(zip(x_values, infections))), np.array(list(zip(x_values, critical)))
-        stats = (infectionStat, critStat)
+        # lists of 2 lists of tuples, for less crowded method signatures
+        # the *Stat2 are moved by half the screen to the right
+        infectionStat1, critStat1 = np.array(list(zip(x_values, infections1))), np.array(list(zip(x_values, critical1)))
+        infectionStat2, critStat2 = \
+            np.array(list(zip(x_values + xLim / 2 + 3, infections2))), \
+            np.array(list(zip(x_values + xLim / 2 + 3, critical2)))
+        stats1 = (infectionStat1, critStat1)
+        stats2 = (infectionStat2, critStat2)
 
         # white background
         win.fill((255, 255, 255))
-        draw(population, win, stats, lockdownFlag)
+        draw(population, win, stats1, stats2, lockdownFlag)
 
         # update our display and clock
         pygame.display.update()
@@ -137,7 +148,7 @@ The plotting function
 """
 
 
-def draw(population, win, stats, lockdownFlag):
+def draw(population, win, stats1, stats2, lockdownFlag):
     # our legend
     font = pygame.font.SysFont('Comic Sans MS', 30)
     healthyText = font.render('Healthy', True, (0, 255, 0))
@@ -159,15 +170,19 @@ def draw(population, win, stats, lockdownFlag):
     # border between areas, thick if lockdownFlag.
     width = 3 if lockdownFlag else 1
     pygame.draw.line(win, pygame.Color(0, 0, 0), (xlowerlim + 3, 205), (xlowerlim + 3, yLim + 215), width)
+
     # borders around it all. All the +5's are for borders near edges
     pygame.draw.line(win, pygame.Color(0, 0, 0), (5, 205), (xLim + 5, 205), 3)  # top
     pygame.draw.line(win, pygame.Color(0, 0, 0), (5, yLim + 215), (xLim + 5, yLim + 215), 3)  # bottom
     pygame.draw.line(win, pygame.Color(0, 0, 0), (5, 205), (5, yLim + 215), 3)  # left
     pygame.draw.line(win, pygame.Color(0, 0, 0), (xLim + 5, 205), (xLim + 5, yLim + 215), 3)  # right
 
-    # drawing stats above sim
-    pygame.draw.lines(win, (255, 215, 0), False, stats[0], 3)  # infections surface, color, closed, data, width
-    pygame.draw.lines(win, (255, 0, 0), False, stats[1], 3)  # critical
+    # drawing stats above sim, only up until they would overlap
+    if stats1[0][len(stats1[0]) - 1][0] < xLim / 2:  # check for overlap
+        pygame.draw.lines(win, (255, 215, 0), False, stats1[0], 3)  # infections surface, color, closed, data, width
+        pygame.draw.lines(win, (255, 0, 0), False, stats1[1], 3)
+        pygame.draw.lines(win, (255, 215, 0), False, stats2[0], 3)
+        pygame.draw.lines(win, (255, 0, 0), False, stats2[1], 3)
 
     # blitting the legend onto our main window
     win.blit(healthyText, (0, 0))
