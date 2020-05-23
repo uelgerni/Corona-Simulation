@@ -53,14 +53,14 @@ def button(x, y, label, length, height, standard_colour, active_colour, border):
 
 
 
-            elif label == 'Social Distancing 40%':
+            elif label == 'Social Distancing 60%':
                 population1 = initialize(popSize=popsize1, infectedPercentage=iPerc, sickPercentage=sPerc,
                                          xlowerlimit=xlowerlim,
                                          xLimit=xLim, ylowerlimit=0, yLimit=yLim)
                 population2 = initializeSD(popSize=popsize2, infectedPercentage=iPerc, sickPercentage=sPerc,
                                            xlowerlimit=0,
                                            xLimit=xlowerlim, ylowerlimit=0, yLimit=yLim,
-                                           SDPercentage=40)
+                                           SDPercentage=60)
                 population = population1.append(population2, ignore_index=True)
                 simulation(population, lockdownFlag)
 
