@@ -67,8 +67,8 @@ class Person:
             deltaY = 0
         # just walk the rest ;)
         elif distance < self.speed:
-            deltaX = (x - self.currentLocation.x) / distance * self.speed
-            deltaY = (y - self.currentLocation.y) / distance * self.speed
+            deltaX = (x - self.currentLocation.x)
+            deltaY = (y - self.currentLocation.y)
 
         # else just go "speed" distance towards current target
         else:
@@ -86,25 +86,22 @@ class Person:
     def setTarget(self, target: Location):
         self.target = target.getCopy()
 
-    # if able to move check whether you're less than one move from your target, if so: set a new target.
-    # then move
-    def updatePos(self, lockdownFlag):
-        if not (self.health is Health.DEAD
-                or self.health is Health.CRITICAL
-                or self.sociald is True
-                or self.testpos is True):
-            if Location.getDistance(self=self.currentLocation, x=self.target.x, y=self.target.y) < self.speed:
-                self.setTarget(targetlocation(self.currentLocation.area, lockdownFlag))
-            self.move(self.deltaXY()[0], self.deltaXY()[1])
+    # low chance to get a worse health state each tick.
+    # will increase recovery time by 50% of total if entering critical state
+    def hospitalRoll(self):
+        chance = random.random()
+        if self.health is Health.INFECTED:
+            if chance < 0.005:
+                self.setSick(self.daysUntilRecovered + duration / 3)
 
-    # one day closer to recovery, and if duration is over -> recover
-    def updateHealth(self):
-        if self.daysUntilRecovered > 0:
-            self.daysUntilRecovered -= 1
-        if self.daysUntilRecovered == 0:
-            self.setRecovered()
-        self.hospitalRoll()
-        self.deathRoll()
+            elif chance < .007:
+                self.setCritical()
+                self.daysUntilRecovered += duration / 2
+
+        elif self.health is Health.SICK:
+            if chance < .006:
+                self.setCritical()
+                self.daysUntilRecovered += duration / 2
 
     # low chance to die each tick, higher the more serious the infection is
     def deathRoll(self):
@@ -121,20 +118,25 @@ class Person:
                 if chance < .001:
                     self.setDead()
 
-    # low chance to enter critical state. will increase recovery time by 50% of total if entering critical state
-    def hospitalRoll(self):
-        chance = random.random()
-        if self.health is Health.INFECTED:
-            if chance < 0.05:
-                self.setSick()
-                self.daysUntilRecovered += duration/3
-            elif chance < .013:
-                self.setCritical()
-                self.daysUntilRecovered += duration / 2
-        if self.health is Health.SICK:
-            if chance < .006:
-                self.setCritical()
-                self.daysUntilRecovered += duration / 2
+    # one day closer to recovery, and if duration is over -> recover
+    def updateHealth(self):
+        if self.daysUntilRecovered > 0:
+            self.daysUntilRecovered -= 1
+        if self.daysUntilRecovered == 0:
+            self.setRecovered()
+        self.hospitalRoll()
+        self.deathRoll()
+
+    # if able to move check whether you're less than one move from your target, if so: set a new target.
+    # then move
+    def updatePos(self, lockdownFlag):
+        if not (self.health is Health.DEAD
+                or self.health is Health.CRITICAL
+                or self.sociald
+                or self.testpos):
+            if (self.currentLocation.x, self.currentLocation.y) == (self.target.x, self.target.y):
+                self.setTarget(targetlocation(self.currentLocation.area, lockdownFlag))
+            self.move(self.deltaXY()[0], self.deltaXY()[1])
 
     def update(self, lockdownFlag):
         self.updateHealth()
