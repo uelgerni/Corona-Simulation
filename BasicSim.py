@@ -89,7 +89,7 @@ def simulation(population, lockdownFlag):
     # frame settings and window init
     FPS = 60  # frames per second setting
     fpsClock = pygame.time.Clock()
-    win = pygame.display.set_mode((xLim + 10, yLim + 220))  # more space in y direction for stats and legend
+    win = pygame.display.set_mode((xLim1 + 10, yLim1 + 220))  # more space in y direction for stats and legend
 
     # caption
     pygame.display.set_caption("Corona Simulation")
@@ -126,8 +126,8 @@ def simulation(population, lockdownFlag):
         # the *Stat2 are moved by half the screen to the right
         infectionStat1, critStat1 = np.array(list(zip(x_values+5, infections1))), np.array(list(zip(x_values+5, critical1)))
         infectionStat2, critStat2 = \
-            np.array(list(zip(x_values + xLim / 2 + 5, infections2))), \
-            np.array(list(zip(x_values + xLim / 2 + 5, critical2)))
+            np.array(list(zip(x_values + xLim1 / 2 + 5, infections2))), \
+            np.array(list(zip(x_values + xLim1 / 2 + 5, critical2)))
         stats1 = (infectionStat1, critStat1)
         stats2 = (infectionStat2, critStat2)
 
@@ -168,14 +168,22 @@ def draw(population, win, stats1, stats2, lockdownFlag):
         pygame.draw.circle(win, color, (x + 5, y + 208), 10)
 
     # border between areas, thick if lockdownFlag.
-    width = 3 if lockdownFlag else 1
-    pygame.draw.line(win, pygame.Color(0, 0, 0), (xlowerlim + 3, 205), (xlowerlim + 3, yLim + 215), width)
+#    width = 3 if lockdownFlag else 1
+#    pygame.draw.line(win, pygame.Color(0, 0, 0), (xlowerlim + 3, 205), (xlowerlim + 3, yLim + 215), width)
 
     # borders around it all. All the +5's are for borders near edges
     pygame.draw.line(win, pygame.Color(0, 0, 0), (5, 205), (xLim + 5, 205), 3)  # top
     pygame.draw.line(win, pygame.Color(0, 0, 0), (5, yLim + 215), (xLim + 5, yLim + 215), 3)  # bottom
     pygame.draw.line(win, pygame.Color(0, 0, 0), (5, 205), (5, yLim + 215), 3)  # left
     pygame.draw.line(win, pygame.Color(0, 0, 0), (xLim + 5, 205), (xLim + 5, yLim + 215), 3)  # right
+
+
+    # borders around population2. All the +5's are for borders near edges, thick if lockdownFlag
+    width = 3 if lockdownFlag else 1
+    pygame.draw.line(win, pygame.Color(0, 0, 0), (xlowerlim2 + 5, ylowerlim2 + 205), (xLim2 + 5, ylowerlim2 + 205), width)  # top
+    pygame.draw.line(win, pygame.Color(0, 0, 0), (xlowerlim2 + 5, yLim2 + 215), (xLim2 + 5, yLim2 + 215), width)  # bottom
+    pygame.draw.line(win, pygame.Color(0, 0, 0), (xlowerlim2 + 5, ylowerlim2 + 205), (xlowerlim2 + 5, yLim2 + 215), width)  # left
+    pygame.draw.line(win, pygame.Color(0, 0, 0), (xLim2 + 5, ylowerlim2 + 205), (xLim2 + 5, yLim2 + 215), width)  # right
 
     # drawing stats above sim, only up until they would overlap
     if stats1[0][len(stats1[0]) - 1][0] < xLim / 2:  # check for overlap

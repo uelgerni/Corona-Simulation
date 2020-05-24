@@ -48,8 +48,8 @@ def randomLocation(area: Area):
     return Location(x, y, area)
 
 
-allowedareas = [Area(xlowerlimit=xlowerlim, xlimit=xLim, ylowerlimit=ylowerlim, ylimit=yLim),
-                Area(xlowerlimit=0, xlimit=xlowerlim, ylowerlimit=ylowerlim, ylimit=yLim)]
+allowedareas = [Area(xlowerlimit=xlowerlim1, xlimit=xLim1, ylowerlimit=ylowerlim1, ylimit=yLim1),
+                Area(xlowerlimit=xlowerlim2, xlimit=xLim2, ylowerlimit=ylowerlim2, ylimit=yLim2)]
 
 
 def targetlocation(area: Area, lockdownFlag):
