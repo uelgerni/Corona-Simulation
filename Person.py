@@ -127,7 +127,10 @@ class Person:
     def hospitalRoll(self):
         chance = random.random()
         if self.health is Health.INFECTED:
-            if chance < .003:
+            if chance < 0.05:
+                self.setSick()
+                self.daysUntilRecovered += duration/3
+            elif chance < .013:
                 self.setCritical()
                 self.daysUntilRecovered += duration / 2
         if self.health is Health.SICK:
