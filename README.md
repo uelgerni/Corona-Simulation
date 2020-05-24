@@ -22,7 +22,7 @@ In der Params.py Dateikönnen folgende Parameter eingestellt werden:
     * Schwere Verläufe dauern 50% länger
 * Die Testkapazität und Häufigkeit der Tests, Standardwerte sind 10 Tests alle 2 Ticks.
     * Für eine Simulation ohne Tests kann der Wert einfach auf 0 gesetzt werden.
-*Die Gebietsgrößen, wobei das eine Gebiet von (0,0) bis (xlowerlim,ylowerlim) geht, das andere von (x
+*Die Gebietsgrößen, wobei das eine Gebiet von (0,0) bis (xlowerlim,ylowerlim) geht, das andere von (xlowerlim, ylowerlim) bis (xLim, yLim)
 
 
 ## Klassen/Dateien
