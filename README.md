@@ -7,7 +7,7 @@ Es werden verschiedene Szenarien vorgeschlagen, wobei das Szenario jeweils nur i
 
 Es wird in verschieden schwere Krankheitsverläufe unterschieden, wobei sowohl Dauer als auch Lethalität der Verläufe verschieden sind.
 
-Es gibt ein Lockdown Szenario, verschieden starke Social Distancing Szenarien, und ein Testszenario, wobei positiv getestete Personen sich entsprechent nicht mehr bewegen (social distancing).
+Es gibt ein Lockdown Szenario, verschieden starke Social Distancing Szenarien, und ein Testszenario, wobei positiv getestete Personen sich entsprechent nicht mehr bewegen (Quarantäne).
 
 
 
@@ -92,6 +92,6 @@ Wenn das SocialDistancing Szenario aufgerufen wird, wird analog zur BasicSim ini
 
 ####Coronatest
 
-Dies ist eine Klasse zum durchführen von Tests, und entsprechender Reaktion auf positiven Test (social distancing)
+Dies ist eine Klasse zum durchführen von Tests, und entsprechender Reaktion auf positiven Test (Quarantäne).
 
 Es kann eingestellt werden, wie viele Tests durchgeführt werden, und wie häufig das geschieht (jeder nte Tick).

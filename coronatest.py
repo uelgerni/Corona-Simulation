@@ -3,7 +3,7 @@ from enum import Enum
 
 
 class Testresult(Enum):
-    HEALTHY = 'healthy'  # snegative testresult
+    HEALTHY = 'healthy'  # negative testresult
     INFECTED = 'infected'  # positive testresult
     NOTEST = 'notest'  # did not test
 
@@ -16,14 +16,13 @@ class Coronatest:
         self.restcap = 0
         self.restperiod = self.period
 
-    def update(self):
+    def update(self):  #countdown untill testcapacity is recharged
         self.restperiod = self.restperiod - 1
         if self.restperiod == 0:
             self.restperiod = self.period
             self.restcap = self.capacity
 
-    def persontest(self, health: Health):
-        # returns Testresult
+    def persontest(self, health: Health):  # returns testresult, negative if person is healthy or recovered, positive if neither, no result if the testcapacity is empty
         if self.restcap == 0:
             return Testresult.NOTEST
         if health == Health.HEALTHY:
@@ -36,11 +35,4 @@ class Coronatest:
             self.restcap = self.restcap - 1
             return Testresult.INFECTED
 
-# coronatest = Coronatest(3,2)
-# coronatest.updatetest()
-# x = coronatest.persontest(Health.HEALTHY)
-# coronatest.updatetest()
-# x = coronatest.persontest(Health.HEALTHY)
-# x = coronatest.persontest(Health.RECOVERED)
-# x = coronatest.persontest(Health.INFECTED)
-# x = coronatest.persontest(Health.HEALTHY)
+
