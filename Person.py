@@ -89,8 +89,10 @@ class Person:
     # if able to move check whether you're less than one move from your target, if so: set a new target.
     # then move
     def updatePos(self, lockdownFlag):
-        if not (
-                self.health is Health.DEAD or self.health is Health.CRITICAL or self.sociald is True or self.testpos is True):
+        if not (self.health is Health.DEAD
+                or self.health is Health.CRITICAL
+                or self.sociald is True
+                or self.testpos is True):
             if Location.getDistance(self=self.currentLocation, x=self.target.x, y=self.target.y) < self.speed:
                 self.setTarget(targetlocation(self.currentLocation.area, lockdownFlag))
             self.move(self.deltaXY()[0], self.deltaXY()[1])
