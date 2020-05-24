@@ -56,12 +56,8 @@ class Person:
             self.health.value)
 
     # calculates the next move
-    def deltaXY(self, xLimit=0, xlowerlimit=0, ylowerlimit=0, yLimit=0):
+    def deltaXY(self):
         x, y = self.target.x, self.target.y  # just for readability
-
-        # just to catch errors, not really needed
-        if (xLimit, yLimit) == (0, 0):
-            xLimit, yLimit = self.currentLocation.area.xlimit, self.currentLocation.area.ylimit
 
         # calculates distance between current location and target
         distance = self.currentLocation.getDistance(x, y)
@@ -70,7 +66,7 @@ class Person:
             deltaX = 0
             deltaY = 0
         # just walk the rest ;)
-        if distance < self.speed:
+        elif distance < self.speed:
             deltaX = (x - self.currentLocation.x) / distance * self.speed
             deltaY = (y - self.currentLocation.y) / distance * self.speed
 
