@@ -86,6 +86,18 @@ class Person:
     def setTarget(self, target: Location):
         self.target = target.getCopy()
 
+    # if able to move check whether you're less than one move from your target, if so: set a new target.
+    # then move
+    def updatePos(self, lockdownFlag):
+        if not (self.health is Health.DEAD
+                or self.health is Health.CRITICAL
+                or self.sociald
+                or self.testpos):
+            if (self.currentLocation.x, self.currentLocation.y) == (self.target.x, self.target.y):
+                self.setTarget(targetlocation(self.currentLocation.area, lockdownFlag))
+            (delX, delY) = self.deltaXY()
+            self.move(delX, delY)
+
     # low chance to get a worse health state each tick.
     # will increase recovery time by 50% of total if entering critical state
     def hospitalRoll(self):
@@ -126,17 +138,6 @@ class Person:
             self.setRecovered()
         self.hospitalRoll()
         self.deathRoll()
-
-    # if able to move check whether you're less than one move from your target, if so: set a new target.
-    # then move
-    def updatePos(self, lockdownFlag):
-        if not (self.health is Health.DEAD
-                or self.health is Health.CRITICAL
-                or self.sociald
-                or self.testpos):
-            if (self.currentLocation.x, self.currentLocation.y) == (self.target.x, self.target.y):
-                self.setTarget(targetlocation(self.currentLocation.area, lockdownFlag))
-            self.move(self.deltaXY()[0], self.deltaXY()[1])
 
     def update(self, lockdownFlag):
         self.updateHealth()
