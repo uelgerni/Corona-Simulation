@@ -89,7 +89,7 @@ def button(x, y, label, length, height, standard_colour, active_colour, border):
                 # run = False
                 pygame.quit()
             elif label == "Lockdown":
-                lockdownFlag = True
+                lockdownFlag = not lockdownFlag
         #
         if click[0] == 0:
             active = False
